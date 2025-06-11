@@ -1,15 +1,16 @@
 import '../pages/index.css';
 import { initialCards } from './cards.js';
-import { openModal, closeModal, closeModalEscape, openPictureModal } from './modal.js';
+import { openModal, closeModal } from './modal.js';
 import { deleteCard, addCard, likeCard } from './card.js';
 
 const placesList = document.querySelector('.places__list');
-
 const profileEditButton = document.querySelector('.profile__edit-button');
 const profileModal = document.querySelector('.popup_type_edit');
 const addButton = document.querySelector('.profile__add-button');
 const addCardModal = document.querySelector('.popup_type_new-card');
 const pictureModal = document.querySelector('.popup_type_image');
+const popupImage = pictureModal.querySelector('.popup__image');
+const popupImageCaption = pictureModal.querySelector('.popup__caption');
 const modals = [profileModal, addCardModal, pictureModal];
 const profileEditForm = profileModal.querySelector('.popup__form');
 const editNameInput = profileEditForm.elements.name;
@@ -20,13 +21,22 @@ const newPlaceForm = addCardModal.querySelector('.popup__form');
 const newPlaceNameInput = newPlaceForm.querySelector('.popup__input_type_card-name');
 const newPlaceImageInput = newPlaceForm.querySelector('.popup__input_type_url');
 
+function openPictureModal(evt) {
+  const pictureModal = document.querySelector('.popup_type_image');
+  popupImage.src = evt.target.src;
+
+  popupImageCaption.textContent = evt.target
+    .closest('.card')
+    .querySelector('.card__title').textContent;
+  openModal(pictureModal);
+}
+
 initialCards.forEach((element) => {
   placesList.append(addCard(element, deleteCard, likeCard, openPictureModal));
 });
 
 profileEditButton.addEventListener('click', () => {
   openModal(profileModal);
-  document.addEventListener('keydown', closeModalEscape);
   editDescriptionInput.value = profileDescription.textContent;
   editNameInput.value = profileTitle.textContent;
 });
