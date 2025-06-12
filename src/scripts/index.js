@@ -22,13 +22,12 @@ const newPlaceNameInput = newPlaceForm.querySelector('.popup__input_type_card-na
 const newPlaceImageInput = newPlaceForm.querySelector('.popup__input_type_url');
 
 function openPictureModal(evt) {
-  const pictureModal = document.querySelector('.popup_type_image');
   popupImage.src = evt.target.src;
-
   popupImageCaption.textContent = evt.target
     .closest('.card')
     .querySelector('.card__title').textContent;
   openModal(pictureModal);
+  popupImage.alt = popupImageCaption.textContent;
 }
 
 initialCards.forEach((element) => {

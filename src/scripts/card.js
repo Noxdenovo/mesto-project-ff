@@ -16,6 +16,7 @@ export function addCard(card, deleteFunction, likeFunction, openModalFunction) {
   const cardTitle = newCard.querySelector('.card__title');
   cardImage.src = card.link;
   cardTitle.textContent = card.name;
+  cardImage.alt = card.name;
   likeButton.addEventListener('click', likeFunction);
   deleteButton.addEventListener('click', () => {
     deleteFunction(newCard);
