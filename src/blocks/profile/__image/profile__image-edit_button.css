@@ -1,0 +1,13 @@
+.profile__image-edit_button {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 26px;
+  height: 26px;
+  background: transparent url('../../../images/avatar-edit-icon.svg');
+  background-size: 26px 26px;
+  background-position: center;
+  border: none;
+  cursor: pointer;
+}
