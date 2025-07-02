@@ -21,15 +21,6 @@ export function getUserInfo() {
     .catch((err) => console.log(err));
 }
 
-export function syncUserInfo(avatarElement, profileNameElement, profileDescriptionElement) {
-  getUserInfo().then((data) => {
-    avatarElement.style.backgroundImage = `url(${data.avatar})`;
-    profileNameElement.textContent = data.name;
-    profileDescriptionElement.textContent = data.about;
-    console.log(data.about);
-  });
-}
-
 export function getAllCards() {
   return fetch(`${apiConfig.baseURL}/cards`, { method: 'GET', headers: apiConfig.headers }).then(
     (res) => {

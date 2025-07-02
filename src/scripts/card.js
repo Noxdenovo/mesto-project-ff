@@ -8,6 +8,17 @@ export function likeCard(evt) {
   evt.target.classList.toggle('card__like-button_is-active');
 }
 
+export function checkLikeStatus(likeButton) {
+  if (likeButton.classList.contains('card__like-button_is-active')) {
+    return true;
+  } else return false;
+}
+
+export function updateLikes(likesArray, likesElement, buttonElement) {
+  likesElement.textContent = likesArray.length;
+  buttonElement.classList.toggle('card__like-button_is-active');
+}
+
 export function addCard(card, handleDeleteClick, likeFunction, openModalFunction, userID) {
   const newCard = cardTemplate.querySelector('.card').cloneNode(true);
   const likeButton = newCard.querySelector('.card__like-button');
@@ -19,13 +30,6 @@ export function addCard(card, handleDeleteClick, likeFunction, openModalFunction
   cardTitle.textContent = card.name;
   cardImage.alt = card.name;
 
-  likeButton.addEventListener('click', (evt) => {
-    likeFunction(evt, card._id)
-      .then((likes) => (cardLikes.textContent = likes.length))
-      .catch((err) => {
-        console.log(err);
-      });
-  });
   cardLikes.textContent = card.likes.length;
 
   const userIDArray = card.likes.map((user) => user._id);
@@ -42,6 +46,11 @@ export function addCard(card, handleDeleteClick, likeFunction, openModalFunction
   } else {
     deleteButton.remove();
   }
-  cardImage.addEventListener('click', openModalFunction);
+  cardImage.addEventListener('click', () => {
+    openModalFunction(card.name, card.link);
+  });
+  likeButton.addEventListener('click', () => {
+    likeFunction(likeButton, cardLikes, card._id);
+  });
   return newCard;
 }

@@ -1,12 +1,11 @@
 import '../pages/index.css';
 import { openModal, closeModal } from './modal.js';
-import { deleteCard, addCard } from './card.js';
+import { deleteCard, addCard, checkLikeStatus, updateLikes } from './card.js';
 import { enableValidation, clearValidation, validationConfig } from './validation.js';
 import {
   getAllCards,
   editUser,
   getUserInfo,
-  syncUserInfo,
   addCardAPI,
   deleteCardAPI,
   unlikeCardAPI,
@@ -38,13 +37,11 @@ const editProfileImageForm = editProfilePictureModal.querySelector('.popup__form
 const editProfileImageInput = editProfileImageForm.querySelector('.popup__input_type_url');
 let userID = null;
 
-function openPictureModal(evt) {
-  popupImage.src = evt.target.src;
-  popupImageCaption.textContent = evt.target
-    .closest('.card')
-    .querySelector('.card__title').textContent;
+function openPictureModal(cardName, cardLink) {
+  popupImage.src = cardLink;
+  popupImageCaption.textContent = cardName;
+  popupImage.alt = cardName;
   openModal(pictureModal);
-  popupImage.alt = popupImageCaption.textContent;
 }
 
 function handleDeleteClick(card, id) {
@@ -55,25 +52,23 @@ function handleDeleteClick(card, id) {
     });
 }
 
-function handleLikeClick(evt, cardID) {
-  if (evt.target.classList.contains('card__like-button_is-active')) {
+function handleLikeClick(likeButton, likesElement, cardID) {
+  if (checkLikeStatus(likeButton)) {
     return unlikeCardAPI(cardID)
       .then((cardData) => {
-        evt.target.classList.remove('card__like-button_is-active');
-        return cardData.likes;
+        updateLikes(cardData.likes, likesElement, likeButton);
       })
-      .then((likes) => likes);
+      .catch((err) => console.log(err));
   } else {
-    return likeCardAPI(cardID).then((cardData) => {
-      evt.target.classList.add('card__like-button_is-active');
-      return cardData.likes;
-    });
+    return likeCardAPI(cardID)
+      .then((cardData) => {
+        updateLikes(cardData.likes, likesElement, likeButton);
+      })
+      .catch((err) => console.log(err));
   }
 }
 
 profileEditButton.addEventListener('click', () => {
-  const profileEditForm = profileModal.querySelector('.popup__form');
-  console.log(profileEditForm);
   openModal(profileModal);
   editDescriptionInput.value = profileDescription.textContent;
   editNameInput.value = profileTitle.textContent;
@@ -106,13 +101,13 @@ profileEditForm.addEventListener('submit', (evt) => {
     .then((res) => {
       profileTitle.textContent = res.name;
       profileDescription.textContent = res.about;
+      closeModal(profileModal);
     })
     .catch((err) => {
       console.log(err);
     })
     .finally(() => {
       submitButton.textContent = 'Сохранить';
-      closeModal(profileModal);
     });
 });
 
@@ -132,14 +127,14 @@ newPlaceForm.addEventListener('submit', (evt) => {
           deleteCardAPI
         )
       );
+      evt.target.reset();
+      closeModal(evt.target.closest('.popup'));
     })
     .catch((err) => {
       console.log(err);
     })
     .finally(() => {
-      evt.target.reset();
       submitButton.textContent = 'Сохранить';
-      closeModal(evt.target.closest('.popup'));
     });
 });
 
@@ -148,12 +143,14 @@ editProfileImageForm.addEventListener('submit', (evt) => {
   const submitButton = evt.target.querySelector('.popup__button');
   submitButton.textContent = 'Сохранение...';
   editProfileImageAPI(editProfileImageInput.value)
-    .then((data) => (profileAvatar.style.backgroundImage = `url(${data.avatar})`))
+    .then((data) => {
+      profileAvatar.style.backgroundImage = `url(${data.avatar})`;
+      evt.target.reset();
+      closeModal(editProfilePictureModal);
+    })
     .catch((err) => console.log(err))
     .finally(() => {
-      evt.target.reset();
       submitButton.textContent = 'Сохранить';
-      closeModal(editProfilePictureModal);
     });
 });
 
@@ -165,11 +162,13 @@ profileImageEditButton.addEventListener('click', () => {
 
 enableValidation(validationConfig);
 
-syncUserInfo(profileAvatar, profileTitle, profileDescription);
-
 Promise.all([getAllCards(), getUserInfo()])
   .then(([cardData, userData]) => {
     userID = userData._id;
+    console.log(userData);
+    profileAvatar.style.backgroundImage = `url(${userData.avatar})`;
+    profileTitle.textContent = userData.name;
+    profileDescription.textContent = userData.about;
 
     cardData.forEach((card) => {
       placesList.append(
