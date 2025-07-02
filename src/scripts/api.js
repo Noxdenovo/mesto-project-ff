@@ -15,7 +15,6 @@ export function getUserInfo() {
       if (res.ok) {
         return res.json();
       }
-      console.log(res.status);
       return Promise.reject(`Ошибка: ${res.status}`);
     })
     .catch((err) => console.log(err));

@@ -165,7 +165,6 @@ enableValidation(validationConfig);
 Promise.all([getAllCards(), getUserInfo()])
   .then(([cardData, userData]) => {
     userID = userData._id;
-    console.log(userData);
     profileAvatar.style.backgroundImage = `url(${userData.avatar})`;
     profileTitle.textContent = userData.name;
     profileDescription.textContent = userData.about;
